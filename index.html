@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Our Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Maven Pro', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center items vertically */
+            align-items: center; /* Center items horizontally */
+            background-color: #f8f9fa; /* Light background color */
+        }
+
+        img {
+            max-width: 150px; /* Adjust logo width */
+            margin-bottom: 20px; /* Space below the logo */
+        }
+
+        h1 {
+            font-size: 2.5rem; /* Adjusted font size */
+            margin: 20px 0; /* Space around the heading */
+            color: #333; /* Dark text color */
+        }
+
+        .container {
+            border: 3px solid green; /* Green border */
+            border-radius: 15px;
+            padding: 30px; /* Padding inside the container */
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin: 20px auto; /* Centered with auto margins */
+            background-color: rgba(0, 128, 0, 0.2); /* Light green background */
+            color: black; /* Text color */
+            width: 80%; /* Width of the container */
+            max-width: 400px; /* Max width of the container */
+        }
+
+        button {
+            padding: 10px 20px; /* Button padding */
+            font-size: 1.2rem; /* Button font size */
+            background-color: green; /* Green background */
+            color: white; /* White text */
+            border: none; /* No border */
+            border-radius: 8px; /* Rounded corners */
+            cursor: pointer; /* Pointer on hover */
+            transition: background-color 0.3s, transform 0.2s; /* Transition effects */
+        }
+
+        button:hover {
+            background-color: darkgreen; /* Darker green on hover */
+            transform: scale(1.05); /* Scale effect on hover */
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2rem; /* Smaller font on mobile */
+            }
+
+            button {
+                font-size: 1rem; /* Smaller button font on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <img src="nbs-logo.png" alt="Platform Logo"> <!-- Replace with your logo file -->
+    <h1>Welcome Digital Services Platform</h1>
+    <div class="container">
+        <button onclick="location.href='logincontainer.html'">Get Started</button>
+    </div>
+
+</body>
+</html>
