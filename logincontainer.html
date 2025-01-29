@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Maven Pro', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('your-background-image.jpg'); /* Replace with your image */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            border: 3px solid green;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            margin: 20px;
+            width: 95%;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: green;
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px 40px;
+            font-size: 1.2rem;
+            border: 2px solid green;
+            border-radius: 8px;
+            box-sizing: border-box; /* Include padding and border in element's total width and height */
+        }
+
+        .icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: green;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: green;
+        }
+
+        .checkbox-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: darkgreen;
+            transform: scale(1.05);
+        }
+
+        .register-button {
+            background-color: transparent;
+            color: green;
+            border: 2px solid green;
+            margin-top: 10px;
+        }
+
+        .register-button:hover {
+            background-color: green;
+            color: white;
+        }
+
+        .back-button {
+            background-color: transparent;
+            color: green;
+            border: 2px solid green;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .back-button:hover {
+            background-color: green;
+            color: white;
+        }
+
+        a {
+            color: green;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Login</h1>
+        <div class="input-container">
+            <i class="fas fa-user icon"></i>
+            <input type="text" id="username" placeholder="Username" required>
+        </div>
+        <div class="input-container password-container">
+            <i class="fas fa-lock icon"></i>
+            <input type="password" id="password" placeholder="Password" required>
+            <i class="fas fa-eye toggle-password" onclick="togglePassword()"></i>
+        </div>
+        <div class="checkbox-container">
+            <label>
+                <input type="checkbox" id="remember-me"> Remember Me
+            </label>
+            <a onclick="window.forgotPassword()">Forgot Password?</a>
+        </div>
+        <button id="login-button" onclick="window.login()">Login</button>
+        <button class="register-button" onclick="window.register()">Register</button>
+    </div>
+
+    <script src="firebase-config.js" type="module"></script>
+
+</body>
+</html>

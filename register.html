@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Maven Pro', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('your-background-image.jpg'); /* Replace with your image */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            border: 3px solid green;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            margin: 20px;
+            width: 95%;
+            max-width: 400px;
+            position: relative;
+        }
+
+        h1 {
+            color: green;
+            margin-bottom: 20px;
+        }
+
+        .input-container {
+            position: relative;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        input[type="text"], input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 10px 40px;
+            font-size: 1.2rem;
+            border: 2px solid green;
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus {
+            border-color: darkgreen;
+        }
+
+        .icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: green;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: green;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        button {
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: darkgreen;
+            transform: scale(1.05);
+        }
+
+        button:disabled {
+            background-color: lightgray;
+            cursor: not-allowed;
+        }
+
+        .back-button {
+            background-color: transparent;
+            color: green;
+            border: 2px solid green;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .back-button:hover {
+            background-color: green;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Register to Digital Services Platform</h1>
+        <div class="input-container">
+            <i class="fas fa-user icon"></i>
+            <input type="text" id="firstname" placeholder="First Name" required oninput="validateFields()">
+            <div id="firstname-error" class="error-message"></div>
+        </div>
+        <div class="input-container">
+            <i class="fas fa-user icon"></i>
+            <input type="text" id="surname" placeholder="Surname" required oninput="validateFields()">
+            <div id="surname-error" class="error-message"></div>
+        </div>
+        <div class="input-container">
+            <i class="fas fa-envelope icon"></i>
+            <input type="email" id="email" placeholder="Email Address" required oninput="validateFields()">
+            <div id="email-error" class="error-message"></div>
+        </div>
+        <div class="input-container password-container">
+            <i class="fas fa-lock icon"></i>
+            <input type="password" id="password" placeholder="Password" required oninput="validateFields()">
+            <i class="fas fa-eye toggle-password" onclick="togglePassword('password')"></i>
+            <div id="password-error" class="error-message"></div>
+        </div>
+        <div class="input-container password-container">
+            <i class="fas fa-lock icon"></i>
+            <input type="password" id="confirm-password" placeholder="Re-enter Password" required oninput="validateFields()">
+            <i class="fas fa-eye toggle-password" onclick="togglePassword('confirm-password')"></i>
+            <div id="confirm-password-error" class="error-message"></div>
+        </div>
+        <button id="register-button" onclick="register()" disabled>Register</button>
+        <button class="back-button" onclick="location.href='logincontainer.html'">Back</button>
+    </div>
+
+    <script>
+        const existingEmails = ["user@example.com"]; // Mock existing emails (replace with your data source)
+
+        function togglePassword(inputId) {
+            const passwordInput = document.getElementById(inputId);
+            const passwordToggle = passwordInput.nextElementSibling; 
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                passwordToggle.classList.remove('fa-eye');
+                passwordToggle.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                passwordToggle.classList.remove('fa-eye-slash');
+                passwordToggle.classList.add('fa-eye');
+            }
+        }
+
+        function clearErrors() {
+            document.getElementById('firstname-error').innerText = '';
+            document.getElementById('surname-error').innerText = '';
+            document.getElementById('email-error').innerText = '';
+            document.getElementById('password-error').innerText = '';
+            document.getElementById('confirm-password-error').innerText = '';
+        }
+
+        function validateFields() {
+            clearErrors();
+            const firstname = document.getElementById('firstname').value;
+            const surname = document.getElementById('surname').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            // Check if all fields are filled
+            const registerButton = document.getElementById('register-button');
+            registerButton.disabled = !(firstname && surname && email && password && confirmPassword);
+        }
+
+        function register() {
+            clearErrors();
+
+            const firstname = document.getElementById('firstname').value;
+            const surname = document.getElementById('surname').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+
+            // Validate first name and surname
+            const namePattern = /^[A-Za-z]{1,15}$/;
+            if (!namePattern.test(firstname)) {
+                document.getElementById('firstname-error').innerText = "First Name must be alphabetic and less than 15 characters.";
+                return;
+            }
+            if (!namePattern.test(surname)) {
+                document.getElementById('surname-error').innerText = "Surname must be alphabetic and less than 15 characters.";
+                return;
+            }
+
+            // Validate email uniqueness
+            if (existingEmails.includes(email)) {
+                document.getElementById('email-error').innerText = "This email is already registered.";
+                return;
+            }
+
+            // Validate email suffix
+            if (!email.endsWith('@nbs.co.zw')) {
+                document.getElementById('email-error').innerText = "Please enter a valid email address with the suffix @nbs.co.zw";
+                return;
+            }
+
+            // Validate password strength
+            const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; 
+            if (!passwordPattern.test(password)) {
+                document.getElementById('password-error').innerText = "Password must be at least 8 characters long, include letters, numbers, and special characters.";
+                return;
+            }
+
+            // Validate password match
+            if (password !== confirmPassword) {
+                document.getElementById('confirm-password-error').innerText = "Passwords do not match!";
+                return;
+            }
+
+            // Here you can add your logic to capture the data in the database
+            alert('Registration successful! You can now log in.');
+
+            // Redirect to login page
+            location.href = 'logincontainer.html'; 
+        }
+    </script>
+
+</body>
+</html>

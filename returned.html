@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Returned Terminals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Maven Pro', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-image: url('your-background-image.jpg'); /* Replace with your image */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            border: 3px solid green;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            margin: 20px;
+            width: 95%;  /* Increased width */
+            max-width: 800px;  /* Adjusted max-width */
+            position: relative;
+        }
+
+        h1 {
+            color: green;
+            margin-bottom: 15px;
+        }
+
+        input[type="date"], input[type="text"], select {
+            padding: 10px;
+            margin: 10px 0;
+            width: 90%;
+            border: 2px solid green;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: darkgreen;
+            transform: scale(1.05);
+        }
+
+        .record-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            overflow-x: auto;
+        }
+
+        .record-table th, .record-table td {
+            border: 1px solid green;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .record-table th {
+            background-color: rgba(0, 128, 0, 0.1);
+        }
+
+        .back-button {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .error-message {
+            color: red;
+            display: none;
+        }
+
+        .export-buttons {
+            display: none;  /* Initially hidden */
+            margin-top: 20px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid green;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+        }
+
+        .close {
+            color: red;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: darkred;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Search Returned Terminals</h1>
+
+        <input type="text" id="merchantName" placeholder="Merchant Name">
+        <input type="date" id="startDate" placeholder="Start Date">
+        <input type="date" id="endDate" placeholder="End Date">
+        <button onclick="searchTerminals()">Search</button>
+        <div id="errorMessage" class="error-message"></div>
+
+        <table class="record-table" id="recordsTable" style="display: none;">
+            <thead>
+                <tr>
+                    <th>Terminal Type</th>
+                    <th>Merchant Name</th>
+                    <th>TID</th>
+                    <th>Terminal Serial</th>
+                    <th>Line Serial</th>
+                    <th>Date Returned</th>
+                    <th>Reason for Return</th>
+                    <th>Approved By</th>
+                </tr>
+            </thead>
+            <tbody id="recordsBody"></tbody>
+        </table>
+
+        <div id="exportOptions" class="export-buttons">
+            <button onclick="exportToExcel()">Export to Excel</button>
+            <button onclick="exportToPDF()">Export to PDF</button>
+        </div>
+
+        <button onclick="openModal()">Add Terminal</button>
+
+        <div class="back-button">
+            <button onclick="location.href='services.html#merchant-services-options'">Back to Merchant Services</button>
+        </div>
+    </div>
+
+    <!-- Modal for Adding Terminal -->
+    <div id="addTerminalModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Add Terminal</h2>
+            <select id="terminalType" required>
+                <option value="" disabled selected>Select Terminal</option>
+                <option value="Aisino A75">Aisino A75</option>
+                <option value="Verifone X990">Verifone X990</option>
+                <option value="PAX S20">PAX S20</option>
+                <option value="iPOS">iPOS</option>
+            </select>
+            <input type="text" id="merchantNameForAdd" placeholder="Merchant Name (4-20 alphanumeric)" required>
+            <input type="text" id="tid" placeholder="TID (Starts with NBS)" required>
+            <input type="text" id="terminalSerial" placeholder="Terminal Serial (6-11 alphanumeric)" required>
+            <input type="text" id="lineSerial" placeholder="Line Serial (16-18 digits)" required>
+            <input type="date" id="dispatchedDate" placeholder="Date Dispatched" required>
+            <input type="text" id="returnReason" placeholder="Reason for Return" required>
+            <select id="approvedBy" required>
+                <option value="" disabled selected>Select Approved By</option>
+                <option value="Tinashe Mariridza">Tinashe Mariridza</option>
+                <option value="Takudzwa Madyira">Takudzwa Madyira</option>
+                <option value="Olivia Usai">Olivia Usai</option>
+                <option value="Mufaro Maphosa">Mufaro Maphosa</option>
+            </select>
+            <button onclick="addTerminal()">Add to Database</button>
+            <div id="addErrorMessage" class="error-message"></div>
+        </div>
+    </div>
+
+    <script>
+        const existingTerminals = []; // Array to store existing terminals
+
+        function validateDates(startDate, endDate) {
+            const today = new Date();
+            if (startDate > endDate) {
+                return 'Start date cannot be ahead of end date.';
+            }
+            if (endDate > today) {
+                return 'End date cannot be in the future.';
+            }
+            return null;
+        }
+
+        function searchTerminals() {
+            const startDateInput = document.getElementById('startDate').value;
+            const endDateInput = document.getElementById('endDate').value;
+            const merchantName = document.getElementById('merchantName').value;
+
+            const startDate = new Date(startDateInput);
+            const endDate = new Date(endDateInput);
+
+            // Check if all fields are empty
+            if (!merchantName && !startDateInput && !endDateInput) {
+                document.getElementById('errorMessage').innerText = 'Please enter a merchant name or select date range.';
+                document.getElementById('errorMessage').style.display = 'block';
+                return;
+            }
+
+            const dateError = validateDates(startDate, endDate);
+            if (dateError) {
+                document.getElementById('errorMessage').innerText = dateError;
+                document.getElementById('errorMessage').style.display = 'block';
+                return;
+            }
+
+            // Sample data for demonstration purposes
+            const sampleData = [
+                { type: 'Aisino A75', merchant: 'Merchant 1', tid: 'NBS123', serial: 'ABC123', line: '1234567890123456', date: '2023-01-10', reason: 'Defective', approved: 'Tinashe Mariridza' },
+                // Add more sample records as needed
+            ];
+
+            const recordsBody = document.getElementById('recordsBody');
+            recordsBody.innerHTML = ''; // Clear previous records
+
+            let hasRecords = false;
+
+            sampleData.forEach(record => {
+                if (!merchantName || record.merchant.toLowerCase().includes(merchantName.toLowerCase())) {
+                    recordsBody.innerHTML += `
+                        <tr>
+                            <td>${record.type}</td>
+                            <td>${record.merchant}</td>
+                            <td>${record.tid}</td>
+                            <td>${record.serial}</td>
+                            <td>${record.line}</td>
+                            <td>${record.date}</td>
+                            <td>${record.reason}</td>
+                            <td>${record.approved}</td>
+                        </tr>
+                    `;
+                    hasRecords = true;
+                }
+            });
+
+            if (!hasRecords) {
+                document.getElementById('errorMessage').innerText = 'No records found.';
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('exportOptions').style.display = 'none'; // Hide export buttons if no records
+            } else {
+                document.getElementById('recordsTable').style.display = 'table';
+                document.getElementById('exportOptions').style.display = 'block'; // Show export buttons
+            }
+        }
+
+        function validateFutureDate(dateInput) {
+            const today = new Date();
+            const date = new Date(dateInput);
+            return date <= today;
+        }
+
+        function openModal() {
+            document.getElementById('addTerminalModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('addTerminalModal').style.display = 'none';
+            document.getElementById('addErrorMessage').style.display = 'none'; // Reset error message
+        }
+
+        function addTerminal() {
+            const terminalType = document.getElementById('terminalType').value;
+            const merchantName = document.getElementById('merchantNameForAdd').value;
+            const tid = document.getElementById('tid').value;
+            const terminalSerial = document.getElementById('terminalSerial').value;
+            const lineSerial = document.getElementById('lineSerial').value;
+            const dispatchedDateInput = document.getElementById('dispatchedDate').value;
+            const returnReason = document.getElementById('returnReason').value;
+            const approvedBy = document.getElementById('approvedBy').value;
+
+            const merchantNamePattern = /^[a-zA-Z0-9]{4,20}$/; // Alphanumeric, 4-20 chars
+            const tidPattern = /^NBS/; // TID must start with NBS
+            const terminalSerialPattern = /^[a-zA-Z0-9]{6,11}$/; // 6-11 alphanumeric
+            const lineSerialPattern = /^[0-9]{16,18}$/; // 16-18 digits
+
+            document.getElementById('addErrorMessage').style.display = 'none'; // Reset error message
+
+            if (!terminalType || !merchantName || !tid || !terminalSerial || !lineSerial || !dispatchedDateInput || !returnReason || !approvedBy) {
+                document.getElementById('addErrorMessage').innerText = 'Please fill in all fields.';
+                document.getElementById('addErrorMessage').style.display = 'block';
+                return;
+            }
+
+            if (!merchantNamePattern.test(merchantName)) {
+                document.getElementById('addErrorMessage').innerText = 'Merchant name must be alphanumeric (4-20 chars).';
+                document.getElementById('addErrorMessage').style.display = 'block';
+                return;
+            }
+
+            if (!tidPattern.test(tid)) {
+                document.getElementById('addErrorMessage').innerText = 'TID must start with "NBS".';
+                document.getElementById('addErrorMessage').style.display = 'block';
+                return;
+            }
+
+            if (!terminalSerialPattern.test(terminalSerial)) {
+                document.getElementById('addErrorMessage').innerText = 'Terminal Serial must be 6-11 alphanumeric.';
+                document.getElementById('addErrorMessage').style.display = 'block';
+                return;
+            }
+
+            if (!lineSerialPattern.test(lineSerial)) {
+                document.getElementById('addErrorMessage').innerText = 'Line Serial must be 16-18 digits.';
+                document.getElementById('addErrorMessage').style.display = 'block';
+                return;
+            }
+
+            // Validate dispatched date
+            if (!validateFutureDate(dispatchedDateInput)) {
+                document.getElementById('addErrorMessage').innerText = 'Dispatched date cannot be in the future.';
+                document.getElementById('addErrorMessage').style.display = 'block';
+                return;
+            }
+
+            // Add to existing terminals array
+            const newTerminal = { terminalType, merchantName, tid, terminalSerial, lineSerial, dispatchedDate: dispatchedDateInput, returnReason, approvedBy };
+            existingTerminals.push(newTerminal);
+
+            // Clear inputs
+            document.getElementById('terminalType').selectedIndex = 0;
+            document.getElementById('merchantNameForAdd').value = '';
+            document.getElementById('tid').value = '';
+            document.getElementById('terminalSerial').value = '';
+            document.getElementById('lineSerial').value = '';
+            document.getElementById('dispatchedDate').value = '';
+            document.getElementById('returnReason').value = '';
+            document.getElementById('approvedBy').selectedIndex = 0;
+
+            alert(`Successfully added terminal:\nType: ${terminalType}\nMerchant: ${merchantName}\nTID: ${tid}\nTerminal Serial: ${terminalSerial}\nLine Serial: ${lineSerial}\nDate: ${dispatchedDateInput}\nReason: ${returnReason}\nApproved by: ${approvedBy}`);
+
+            closeModal(); // Close the modal after adding
+        }
+
+        function exportToExcel() {
+            const table = document.getElementById('recordsTable');
+            const rows = Array.from(table.querySelectorAll('tr'));
+            const csv = rows.map(row => Array.from(row.querySelectorAll('td, th')).map(cell => cell.innerText).join(',')).join('\n');
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.setAttribute('href', URL.createObjectURL(blob));
+            link.setAttribute('download', 'terminals.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportToPDF() {
+            const table = document.getElementById('recordsTable');
+            const pdf = new jsPDF('l', 'pt', 'a4');
+            pdf.autoTable({ html: table });
+            pdf.save('terminals.pdf');
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.12/jspdf.plugin.autotable.min.js"></script>
+</body>
+</html>

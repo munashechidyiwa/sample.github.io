@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispatched Terminals</title>
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mangal&display=swap" rel="stylesheet">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Maven Pro', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(240, 240, 240, 0.9);
+        }
+
+        .container {
+            border: 3px solid green;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background-color: white;
+            margin: 20px;
+            width: 95%;
+            max-width: 1000px;
+            position: relative;
+        }
+
+        h1, h3 {
+            color: green;
+            margin-bottom: 20px;
+        }
+
+        .branch-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .branch-grid label {
+            display: flex;
+            align-items: center;
+        }
+
+        input[type="date"], input[type="text"], select, button {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid green;
+            border-radius: 5px;
+            font-family: 'Mangal', sans-serif;
+        }
+
+        button {
+            background-color: green;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: darkgreen;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .results-table th, .results-table td {
+            border: 1px solid green;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .export-buttons {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            gap: 3cm;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid green;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: green;
+        }
+
+        .modal-subheader {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Search Dispatched Terminals</h1>
+        <div class="modal-subheader">
+            <h3>Please select the branch:</h3>
+        </div>
+        <div class="branch-grid">
+            <label><input type="radio" name="branch" value="Masvingo"> Masvingo Branch</label>
+            <label><input type="radio" name="branch" value="Mutare"> Mutare Branch</label>
+            <label><input type="radio" name="branch" value="Chiredzi"> Chiredzi Branch</label>
+            <label><input type="radio" name="branch" value="Gweru"> Gweru Branch</label>
+            <label><input type="radio" name="branch" value="Chinhoyi"> Chinhoyi Branch</label>
+            <label><input type="radio" name="branch" value="Private Banking"> Private Banking</label>
+            <label><input type="radio" name="branch" value="Bindura"> Bindura Branch</label>
+            <label><input type="radio" name="branch" value="Samora"> Samora Branch</label>
+            <label><input type="radio" name="branch" value="JMN Bulawayo"> JMN Bulawayo</label>
+            <label><input type="radio" name="branch" value="SSC"> SSC Branch</label>
+        </div>
+
+        <input type="date" id="startDate" placeholder="Start Date">
+        <input type="date" id="endDate" placeholder="End Date">
+        <button onclick="search()">Search</button>
+        <div class="error" id="error-message"></div>
+
+        <table class="results-table" id="resultsTable" style="display:none;">
+            <thead>
+                <tr>
+                    <th>Terminal Type</th>
+                    <th>Merchant Name</th>
+                    <th>TID</th>
+                    <th>Terminal Serial</th>
+                    <th>Line Serial</th>
+                    <th>Date Dispatched</th>
+                    <th>FedEx Tracking #</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody">
+                <!-- Results will be populated here -->
+            </tbody>
+        </table>
+
+        <div class="export-buttons" id="exportButtons" style="display:none;">
+            <button onclick="exportToPDF()">Export as PDF</button>
+            <button onclick="exportToExcel()">Export as Excel</button>
+        </div>
+
+        <button onclick="showDispatchModal()">Dispatch Terminal</button>
+        <button onclick="goToMerchantServices()" style="margin-top: 20px;">Back to Merchant Services</button>
+    </div>
+
+    <!-- Modal for Dispatch Terminal -->
+    <div id="dispatchModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Dispatch Terminal</h2>
+                <span onclick="closeModal()" style="cursor:pointer;">&times;</span>
+            </div>
+            <div class="modal-subheader">
+                <h3>Please select the terminal:</h3>
+            </div>
+            <select id="terminalType">
+                <option value="Aisino A75">Aisino A75</option>
+                <option value="Verifone X990">Verifone X990</option>
+                <option value="PAX S20">PAX S20</option>
+                <option value="iPOS">iPOS</option>
+            </select>
+
+            <input type="text" id="merchantName" placeholder="Merchant Name" required>
+            <input type="text" id="tid" placeholder="TID (must start with NBS or nbs)" required>
+            <input type="text" id="terminalSerial" placeholder="Terminal Serial (6-11 characters)" maxlength="11" required>
+            <input type="text" id="lineSerial" placeholder="Line Serial (16-18 digits)" maxlength="18" required oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+            <input type="date" id="dispatchDate" placeholder="Date Dispatched" required>
+            <input type="text" id="fedexTracking" placeholder="FedEx Tracking Number (optional)">
+
+            <div class="modal-footer">
+                <button onclick="addTerminal()">Add to Database</button>
+                <button onclick="closeModal()">Back</button>
+            </div>
+            <div class="error" id="modal-error-message"></div>
+        </div>
+    </div>
+
+    <script>
+
+      
+        function goToMerchantServices() {
+            window.location.href = 'services.html'; // Navigate to services.html
+        }
+
+        function exportToPDF() {
+            const resultsTable = document.getElementById('resultsTable');
+            const rows = Array.from(resultsTable.querySelectorAll('tr'));
+            const pdfContent = rows.map(row => Array.from(row.cells).map(cell => cell.innerText).join(',')).join('\n');
+            const blob = new Blob([pdfContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'export.pdf';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        function exportToExcel() {
+            const resultsTable = document.getElementById('resultsTable');
+            const rows = Array.from(resultsTable.querySelectorAll('tr'));
+            const excelContent = rows.map(row => Array.from(row.cells).map(cell => cell.innerText).join('\t')).join('\n');
+            const blob = new Blob([excelContent], { type: 'application/vnd.ms-excel' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'export.xls';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+    <script src="firebase-config.js" type="module"></script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Merchant Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOMq4eZ9r5F3VQx0DkSzkU4/p0u0nHf7u3Fb3c1" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Maven Pro', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('your-background-image.jpg'); /* Replace with your image */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            border: 3px solid green;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            margin: 20px;
+            width: 95%;
+            max-width: 1000px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        h1 {
+            color: green;
+        }
+
+        .radio-group {
+            margin: 20px 0;
+        }
+
+        .radio-group label {
+            margin-right: 20px;
+            font-size: 1.2rem;
+        }
+
+        button {
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: darkgreen;
+            transform: scale(1.05);
+        }
+
+        #upload-section, #graph-section, .report-section {
+            display: none; /* Hidden initially */
+        }
+
+        #upload-section {
+            margin-top: 20px;
+        }
+
+        #graph-section {
+            display: flex; /* Flexbox for side by side layout */
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        #graph {
+            flex: 1;
+            height: 300px;
+            background-color: #e8e8e8;
+            margin-right: 20px;
+            padding: 20px; 
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .report-summary {
+            flex: 1;
+            padding: 20px;
+            border: 2px solid green;
+            border-radius: 10px;
+            background-color: rgba(0, 128, 0, 0.1);
+            overflow-y: auto; /* Allows scrolling if content overflows */
+            max-height: 300px; /* Limit height for better UI */
+        }
+
+        .report-title {
+            font-size: 1.5rem;
+            color: green;
+            margin-bottom: 10px;
+        }
+
+        .share-report-button {
+            margin-top: 20px;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: white;
+            border: 2px solid green;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            color: green;
+            font-size: 1.2rem;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .back-button:hover {
+            background-color: green;
+            color: white;
+        }
+
+        .error-message {
+            color: red;
+            display: none; /* Hidden initially */
+            margin-top: 10px;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            button {
+                width: 100%;
+            }
+
+            #graph {
+                height: 200px; /* Adjust height for smaller screens */
+            }
+
+            .report-summary {
+                max-height: 200px; /* Adjust height for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="back-button" onclick="goBack()"> 
+            <i class="fas fa-arrow-left"></i> Back 
+        </div>
+        
+        <script>
+        function goBack() {
+            window.location.href = "services.html#merchant-services";
+        }
+        </script>
+        <h1>Daily Merchant Report</h1>
+        <div class="radio-group">
+            <label>
+                <input type="radio" name="currency" value="ZWG" id="zwg-radio">
+                ZWG
+            </label>
+            <label>
+                <input type="radio" name="currency" value="USD" id="usd-radio">
+                USD
+            </label>
+        </div>
+        <button onclick="showUploadSection()">OK</button>
+        <div class="error-message" id="currency-error-message">Please select a currency.</div>
+
+        <div id="upload-section">
+            <h2>Upload Excel File</h2>
+            <input type="file" accept=".xlsx" id="file-upload">
+            <button onclick="showGraphSection()">Upload</button>
+            <div class="error-message" id="upload-error-message">Please select a file to upload.</div>
+        </div>
+
+        <div id="graph-section">
+            <div id="graph">
+                <p style="padding: 100px; text-align: center; color: gray;">Graph will be displayed here.</p>
+            </div>
+            <div class="report-summary" id="report-section">
+                <h2 class="report-title">Report Summary</h2>
+                <div id="graph-report"></div>
+                <div id="merchant-gainers"></div>
+                <div id="shakers"></div>
+                <div id="top-performers"></div>
+                <div id="bottom-performers"></div>
+                <div class="share-report-button">
+                    <button onclick="shareReportPDF()">Share Report as PDF</button>
+                    <button onclick="shareReportExcel()">Share Report as Excel</button>
+                    <div class="error-message" id="error-message">Please upload an Excel file before sharing the report.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let fileUploaded = false; // Track if a file has been uploaded
+
+        function goBack() {
+            // Redirect to services.html and scroll to the merchant services section
+            window.location.href = 'services.html#merchant-services'; // Adjust anchor as needed
+        }
+
+        function showUploadSection() {
+            const radioButtons = document.getElementsByName('currency');
+            let selectedCurrency = Array.from(radioButtons).find(radio => radio.checked);
+            if (selectedCurrency) {
+                document.getElementById('currency-error-message').style.display = 'none'; // Hide error message
+                document.getElementById('upload-section').style.display = 'block';
+            } else {
+                document.getElementById('currency-error-message').style.display = 'block'; // Show error message
+            }
+        }
+
+        function showGraphSection() {
+            const fileInput = document.getElementById('file-upload');
+            if (!fileInput.files.length) {
+                document.getElementById('upload-error-message').style.display = 'block'; // Show error message
+                return;
+            } else {
+                document.getElementById('upload-error-message').style.display = 'none'; // Hide error message
+            }
+
+            fileUploaded = true; // Mark that a file has been uploaded
+            document.getElementById('graph-section').style.display = 'flex';
+            document.getElementById('upload-section').style.display = 'none'; // Hide upload section
+            document.getElementById('graph').innerHTML = '<p style="padding: 100px; text-align: center; color: gray;">Graph loaded successfully.</p>';
+            generateReport(); // Automatically generate report for demo
+        }
+
+        function generateReport() {
+            document.getElementById('report-section').style.display = 'block';
+            document.getElementById('graph-report').innerHTML = '<strong>Graph Report:</strong> <br>Graph will be displayed here.';
+            document.getElementById('merchant-gainers').innerHTML = '<strong>Merchant Gainers:</strong> <br>List of gainers will be displayed here.';
+            document.getElementById('shakers').innerHTML = '<strong>Shakers:</strong> <br>List of shakers will be displayed here.';
+            document.getElementById('top-performers').innerHTML = '<strong>Top 20 Performers:</strong> <br>List of top 20 performers will be displayed here.';
+            document.getElementById('bottom-performers').innerHTML = '<strong>Bottom 20 Performers:</strong> <br>List of bottom 20 performers will be displayed here.';
+        }
+
+        function shareReportPDF() {
+            if (!fileUploaded) {
+                document.getElementById('error-message').style.display = 'block'; // Show error message
+                return;
+            }
+            document.getElementById('error-message').style.display = 'none'; // Hide error message
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const reportContent = `
+                Daily Merchant Report\n
+                Graph Report: Graph will be displayed here.\n
+                Merchant Gainers: List of gainers will be displayed here.\n
+                Shakers: List of shakers will be displayed here.\n
+                Top 20 Performers: List of top 20 performers will be displayed here.\n
+                Bottom 20 Performers: List of bottom 20 performers will be displayed here.
+            `;
+
+            doc.text(reportContent, 10, 10);
+            doc.save('Daily_Merchant_Report.pdf'); // Save as PDF
+        }
+
+        function shareReportExcel() {
+            if (!fileUploaded) {
+                document.getElementById('error-message').style.display = 'block'; // Show error message
+                return;
+            }
+            document.getElementById('error-message').style.display = 'none'; // Hide error message
+
+            const reportData = [
+                ["Daily Merchant Report"],
+                ["Graph Report", "Graph will be displayed here."],
+                ["Merchant Gainers", "List of gainers will be displayed here."],
+                ["Shakers", "List of shakers will be displayed here."],
+                ["Top 20 Performers", "List of top 20 performers will be displayed here."],
+                ["Bottom 20 Performers", "List of bottom 20 performers will be displayed here."]
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(reportData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Report");
+
+            XLSX.writeFile(wb, "Daily_Merchant_Report.xlsx"); // Save as Excel
+        }
+    </script>
+
+</body>
+</html>

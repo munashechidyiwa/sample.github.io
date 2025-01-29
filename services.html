@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services</title>
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Maven Pro', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-image: url('your-background-image.jpg'); /* Replace with your image */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            border: 3px solid green;
+            border-radius: 15px;
+            padding: 20px; /* Reduced padding */
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            margin: 20px;
+            width: 90%; /* Adjusted width */
+            max-width: 600px; /* More compact maximum width */
+        }
+
+        h1 {
+            color: green;
+            margin-bottom: 15px; /* Reduced margin */
+        }
+
+        .service-container {
+            border: 2px solid green;
+            border-radius: 10px;
+            padding: 15px; /* Reduced padding */
+            text-align: center;
+            margin: 10px;
+            cursor: pointer;
+            background-color: rgba(0, 128, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            flex: 1 1 30%; /* Grow and shrink, with a base width of 30% */
+        }
+
+        .service-container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .service-grid {
+            display: flex;
+            flex-wrap: wrap; /* Allow wrapping to the next line */
+            justify-content: space-between; /* Space out items evenly */
+        }
+
+        button {
+            padding: 10px 20px; /* Reduced padding */
+            font-size: 1rem; /* Adjusted font size */
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 15px; /* Reduced margin */
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: darkgreen;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Services Container -->
+    <div class="container" id="main-services">
+        <h1>Select Your Service</h1>
+        <div class="service-grid">
+            <div class="service-container" onclick="showDigitalServices()">
+                <h2>Digital Financial Services</h2>
+            </div>
+            <div class="service-container" onclick="showMerchantServices()">
+                <h2>Merchant Services</h2>
+            </div>
+        </div>
+        <button onclick="location.href='logincontainer.html'">Back</button>
+    </div>
+
+    <!-- Digital Financial Services Options -->
+    <div class="container" id="digital-services" style="display: none;">
+        <h1>Digital Financial Services Options</h1>
+        <div class="service-grid">
+            <div class="service-container" onclick="navigateTo('cards-issuance-report.html')">
+                <h2>Cards Issuance Report</h2>
+            </div>
+            <div class="service-container" onclick="navigateTo('daily-report.html')">
+                <h2>Daily Report</h2>
+            </div>
+            <div class="service-container" onclick="navigateTo('digital-financial-tracker.html')">
+                <h2>Digital Financial Tracker</h2>
+            </div>
+            <div class="service-container" onclick="navigateTo('weekly-issues-tracker.html')">
+                <h2>Weekly Issues Tracker</h2>
+            </div>
+            <div class="service-container" onclick="navigateTo('accounts-vs-ussd.html')">
+                <h2>Accounts vs USSD Registration</h2>
+            </div>
+            <div class="service-container" onclick="navigateTo('failed-transactions.html')">
+                <h2>Failed Transactions</h2>
+            </div>
+            <div class="service-container" onclick="navigateTo('failed-registrations.html')">
+                <h2>Failed Registrations Report</h2>
+            </div>
+        </div>
+        <button onclick="goBackToMain()">Back</button>
+    </div>
+
+    <!-- Merchant Services Options -->
+    <div class="container" id="merchant-services" style="display: none;">
+        <h1>Merchant Services Options</h1>
+        <div class="service-grid">
+            <div class="service-container" onclick="navigateTo('dailyreport.html')">
+                <h2>Daily Merchant Report</h2>
+            </div>
+            <div class="service-container" onclick="window.location.href='http://192.168.1.135:8080/GatewayAdmin/viewTerminal.xhtml?optionId=VTERM#no-back-button'">
+                <h2>Merchant Tracker</h2>
+            </div>
+            <div class="service-container" onclick="navigateTo('simcardtracking.html')">
+                <h2>SIM Card Tracking</h2>
+            </div>
+            <div class="service-container" onclick="navigateTo('cta-report.html')">
+                <h2>CTA Report</h2>
+            </div>
+            <div class="service-container" onclick="navigateTo('returned.html')">
+                <h2>Returned Terminals</h2>
+            </div>
+            <div class="service-container" onclick="navigateTo('dispatched.html')">
+                <h2>Dispatched Terminals</h2>
+            </div>
+        </div>
+        <button onclick="goBackToMain()">Back</button>
+    </div>
+
+    <script>
+        function showDigitalServices() {
+            document.getElementById('main-services').style.display = 'none';
+            document.getElementById('digital-services').style.display = 'block';
+        }
+
+        function showMerchantServices() {
+            document.getElementById('main-services').style.display = 'none';
+            document.getElementById('merchant-services').style.display = 'block';
+        }
+
+        function goBackToMain() {
+            document.getElementById('digital-services').style.display = 'none';
+            document.getElementById('merchant-services').style.display = 'none';
+            document.getElementById('main-services').style.display = 'block';
+        }
+
+        function navigateTo(page) {
+            window.location.href = page; // Change to your target page
+        }
+    </script>
+
+</body>
+</html>

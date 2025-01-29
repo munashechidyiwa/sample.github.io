@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sim Card Tracking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Maven+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Maven Pro', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('your-background-image.jpg'); /* Replace with your image */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .container {
+            border: 3px solid green;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.9);
+            margin: 20px;
+            width: 95%;
+            max-width: 600px;
+            position: relative; /* For positioning the back button */
+        }
+
+        h1 {
+            color: green;
+        }
+
+        .radio-group {
+            margin: 20px 0;
+        }
+
+        .radio-group label {
+            margin-right: 20px;
+            font-size: 1.2rem;
+        }
+
+        button {
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: darkgreen;
+            transform: scale(1.05);
+        }
+
+        #serial-input-section {
+            display: none; /* Hidden initially */
+            margin-top: 20px;
+        }
+
+        .error-message {
+            color: red;
+            display: none; /* Hidden initially */
+            margin-top: 10px;
+        }
+
+        #serial-number {
+            width: 100%;
+            padding: 10px;
+            font-size: 1.2rem;
+            border: 2px solid green;
+            border-radius: 8px;
+            margin-top: 10px;
+            box-sizing: border-box; /* Include padding and border in element's total width and height */
+        }
+
+        #result-container {
+            display: none; /* Hidden initially */
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid green;
+            border-radius: 8px;
+            background-color: rgba(0, 128, 0, 0.1);
+            color: green;
+            text-align: left;
+        }
+
+        /* Back button styling */
+        .back-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: transparent;
+            border: none;
+            color: green;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        /* Serial number highlighting */
+        .highlight-red {
+            color: red;
+        }
+
+        .highlight-black {
+            color: black;
+        }
+
+        /* Responsive design */
+        @media (max-width: 600px) {
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <button class="back-button" onclick="location.href='services.html'">Back</button>
+        <h1>Sim Card Tracking</h1>
+        <div class="radio-group">
+            <label>
+                <input type="radio" name="provider" value="Telecel Zimbabwe" id="telecel-radio">
+                Telecel Zimbabwe
+            </label>
+            <label>
+                <input type="radio" name="provider" value="NetOne" id="netone-radio">
+                ZW NetOne
+            </label>
+            <label>
+                <input type="radio" name="provider" value="Econet Wireless" id="econet-radio">
+                Econet Wireless
+            </label>
+        </div>
+        <button onclick="showSerialInput()">OK</button>
+        <div class="error-message" id="provider-error-message">Please select a provider.</div>
+
+        <div id="serial-input-section">
+            <h2>Enter Serial Number</h2>
+            <input type="text" id="serial-number" placeholder="Enter Serial Number (16-18 digits)" oninput="highlightSerialNumber()">
+            <div class="error-message" id="serial-error-message">Please enter a valid serial number (16-18 digits).</div>
+            <button onclick="searchSerial()">Search</button>
+        </div>
+
+        <div id="result-container">
+            <h2>Result</h2>
+            <div id="merchant-details"></div>
+            <button onclick="exportToExcel()">Export to Excel</button>
+            <button onclick="exportToPDF()">Export to PDF</button>
+            <button onclick="exportToCSV()">Export to CSV</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script>
+        function showSerialInput() {
+            const radioButtons = document.getElementsByName('provider');
+            let selectedProvider = Array.from(radioButtons).find(radio => radio.checked);
+            if (selectedProvider) {
+                document.getElementById('provider-error-message').style.display = 'none'; // Hide error message
+                document.getElementById('serial-input-section').style.display = 'block'; // Show serial input section
+            } else {
+                document.getElementById('provider-error-message').style.display = 'block'; // Show error message
+            }
+        }
+
+        function highlightSerialNumber() {
+            const serialInput = document.getElementById('serial-number');
+            const serialNumber = serialInput.value;
+
+            if (serialNumber.length < 16) {
+                serialInput.classList.add('highlight-red');
+                serialInput.classList.remove('highlight-black');
+            } else if (serialNumber.length >= 16 && serialNumber.length <= 18) {
+                serialInput.classList.remove('highlight-red');
+                serialInput.classList.add('highlight-black');
+            } else {
+                serialInput.value = serialNumber.slice(0, 18); // Limit input to 18 digits
+            }
+        }
+
+        function searchSerial() {
+            const serialNumber = document.getElementById('serial-number').value;
+            const serialErrorMessage = document.getElementById('serial-error-message');
+            const resultContainer = document.getElementById('result-container');
+            const merchantDetails = document.getElementById('merchant-details');
+
+            // Validate serial number
+            if (!/^\d{16,18}$/.test(serialNumber)) {
+                serialErrorMessage.style.display = 'block'; // Show error message
+                resultContainer.style.display = 'none'; // Hide result container
+                return;
+            } else {
+                serialErrorMessage.style.display = 'none'; // Hide error message
+            }
+
+            // Simulate fetching data from a database
+            const provider = document.querySelector('input[name="provider"]:checked').value;
+
+            // Placeholder data, this should come from a database in a real application
+            const merchantInfo = {
+                "Telecel Zimbabwe": {
+                    name: "Telecel Merchant",
+                    contact: "123-456-7890",
+                    address: "123 Telecel St, Harare"
+                },
+                "NetOne": {
+                    name: "NetOne Merchant",
+                    contact: "987-654-3210",
+                    address: "456 NetOne Ave, Harare"
+                },
+                "Econet Wireless": {
+                    name: "Econet Merchant",
+                    contact: "555-555-5555",
+                    address: "789 Econet Blvd, Harare"
+                }
+            };
+
+            const merchant = merchantInfo[provider];
+            const message = `
+                <strong>Serial Number:</strong> ${serialNumber}<br>
+                <strong>Service Provider:</strong> ${provider}<br>
+                <strong>Merchant Name:</strong> ${merchant.name}<br>
+                <strong>Merchant Contact:</strong> ${merchant.contact}<br>
+                <strong>Merchant Address:</strong> ${merchant.address}
+            `;
+            merchantDetails.innerHTML = message; // Fill result container with message
+            resultContainer.style.display = 'block'; // Show result container
+        }
+
+        function exportToExcel() {
+            const serialNumber = document.getElementById('serial-number').value;
+            const provider = document.querySelector('input[name="provider"]:checked').value;
+            const merchantDetails = document.getElementById('merchant-details').innerText.split('\n');
+
+            const data = [
+                ["Serial Number", serialNumber],
+                ["Service Provider", provider],
+                ["Merchant Name", merchantDetails[2].split(": ")[1]],
+                ["Merchant Contact", merchantDetails[3].split(": ")[1]],
+                ["Merchant Address", merchantDetails[4].split(": ")[1]]
+            ];
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            data.forEach(rowArray => {
+                const row = rowArray.join(",");
+                csvContent += row + "\r\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "merchant_info.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function exportToPDF() {
+            const serialNumber = document.getElementById('serial-number').value;
+            const provider = document.querySelector('input[name="provider"]:checked').value;
+            const merchantDetails = document.getElementById('merchant-details').innerText.split('\n');
+
+            const doc = new jsPDF();
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "bold");
+            doc.text("Merchant Information", 10, 10);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Serial Number: ${serialNumber}`, 10, 20);
+            doc.text(`Service Provider: ${provider}`, 10, 30);
+            doc.text(`Merchant Name: ${merchantDetails[2].split(": ")[1]}`, 10, 40);
+            doc.text(`Merchant Contact: ${merchantDetails[3].split(": ")[1]}`, 10, 50);
+            doc.text(`Merchant Address: ${merchantDetails[4].split(": ")[1]}`, 10, 60);
+            doc.save('merchant_info.pdf');
+        }
+
+        function exportToCSV() {
+            const serialNumber = document.getElementById('serial-number').value;
+            const provider = document.querySelector('input[name="provider"]:checked').value;
+            const merchantDetails = document.getElementById('merchant-details').innerText.split('\n');
+
+            const data = [
+                ["Serial Number", serialNumber],
+                ["Service Provider", provider],
+                ["Merchant Name", merchantDetails[2].split(": ")[1]],
+                ["Merchant Contact", merchantDetails[3].split(": ")[1]],
+                ["Merchant Address", merchantDetails[4].split(": ")[1]]
+            ];
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            data.forEach(rowArray => {
+                const row = rowArray.join(",");
+                csvContent += row + "\r\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "merchant_info.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
